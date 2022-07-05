@@ -1,0 +1,19 @@
+{
+  "name": "ramni",
+  "version": "1.0.0",
+  "description": "cybersoft_project",
+  "main": "index.js",
+  "repository": "https://github.com/AnhBrother/Project_Cybersoft.git",
+  "author": "kait14a12@gmail.com <kaito14a12@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.18",
+    "pg": "^8.7.3",
+    "prisma": "^4.0.0"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  }
+}
