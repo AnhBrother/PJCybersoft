@@ -1,5 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+// 1: basic
+// 2: admin
 
 generator client {
   provider = "prisma-client-js"
@@ -8,4 +10,101 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Users {
+  id String @id 
+  username String @unique
+  pass_word String
+  role Int @default(1)
+
+  user_detail User_detail?
+}
+
+model User_detail {
+  id Int @id @default(autoincrement())
+  email String 
+  phone String
+  pin_code String
+  user_ID String @unique 
+
+  user Users @relation(fields: [user_ID], references: [id])
+  payment Payment[] 
+  address Address[]
+}
+
+model Product {
+  id Int @id @default(autoincrement())
+  name String
+  price Int
+  description String
+  review String
+  rate Int
+  offers String
+  policy String
+  category_ID Int
+  brand_ID Int
+
+  category Category @relation(fields: [category_ID], references: [id])
+  brand Brand @relation(fields: [brand_ID], references: [id])
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  name String
+
+  product Product[]
+}
+
+model Brand {
+  id Int @id @default(autoincrement())
+  name String
+
+  product Product[]
+}
+
+model Payment_method {
+  id Int @id @default(autoincrement())
+  name String
+
+  payment Payment[]
+}
+
+model Payment {
+  id Int @id @default(autoincrement())
+  name String
+  card_number String
+  inc_date DateTime @default(now())
+  exp_date DateTime @default(now())
+  payment_method_ID Int
+  user_detail_ID Int
+
+  user_detail User_detail @relation(fields: [user_detail_ID], references: [id])
+  payment_method Payment_method @relation(fields: [payment_method_ID], references: [id])
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+  country String
+  district District[]
+  user_detail_ID Int
+
+  user_detail User_detail @relation(fields: [user_detail_ID], references: [id])
+}
+
+model District {
+  id Int @id @default(autoincrement())
+  name String
+  commune Commune[]
+  address_ID Int
+
+  address Address @relation(fields: [address_ID], references: [id])
+}
+
+model Commune {
+  id Int @id @default(autoincrement())
+  name String
+  district_ID Int
+
+  district District @relation(fields: [district_ID], references: [id])
 }
