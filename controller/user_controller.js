@@ -29,6 +29,7 @@ const get_user = async (req, res) => {
 
 const update_user = async (req, res) => {
     const inp_data = req.body
+   
     try {
         const data = await db.users.findFirst({
             where:{
@@ -41,16 +42,18 @@ const update_user = async (req, res) => {
             },
             data:{
                 email: inp_data.email,
-                phone: inp_data.phone
+                phone: inp_data.phone,
+                pin_code: inp_data.pin_code
             },
             select:{
                 email: true,
-                phone: true
+                phone: true,
+                pin_code: true
             }
         })
         console.log(inp_data)
         if (null == upd_user_detail) {
-            res.status(200).send('User not found or not update')
+            res.status(201).send('User not found or not update')
         } else {
             res.status(200).send(upd_user_detail)
         }
@@ -60,55 +63,37 @@ const update_user = async (req, res) => {
 }
 
 const delete_user = async (req, res) => {
-    try {   
-        const {username} = req.body 
-        const data = await db.users.findFirst({
-            where: {
-                username: username
-            }
-        })
+    const {username} = req.body 
 
-        const index = data.id
-
-        await db.user_detail.delete({
-            where:{
-                user_ID: index
-            }
-        })
-
-        await db.users.delete({
-            where:{
-                username : username
-            }
-        })
-        
-        res.status(200).send("Delete Success")
-    } catch (error) {
+    if (username == null) {
         res.status(500).send({message: 'Vui long nhap lai tai khoan', status_code: 401, success: false})
+    } else {
+        try {           
+            const data = await db.users.findFirst({
+                where: {
+                    username: username
+                }
+            })
+    
+            const index = data.id
+    
+            await db.user_detail.delete({
+                where:{
+                    user_ID: index
+                }
+            })
+    
+            await db.users.delete({
+                where:{
+                    username : username
+                }
+            })
+            
+            res.status(200).send("Delete Success")
+        } catch (error) {
+            res.status(500).send({message: 'Vui long nhap lai tai khoan', status_code: 401, success: false})
+        }   
     }
-    
-    
-    // if (user) {
-    //     const isSuccess = bcrypt.compareSync(pass_word, user.pass_word)
-    //     if (isSuccess) {  
-    //         await db.users.delete({
-    //             where:{
-    //                 username: find_data
-    //             }
-    //         })
-    //         res.status(200).send("Delete Success")
-    //     }else{
-    //         res.status(401).send({message: 'fail', status_code: 401, success: false})
-    //     }
-    // }
-    // else{
-    //     res.status(401).send({message: 'Vui long nhap lai tai khoan', status_code: 201, success: false})
-    // }
-    //     await db.user_detail.delete({
-    //         where:{
-    //             user_ID: data.id
-    //         }
-    //     })
 }
 
 module.exports = {

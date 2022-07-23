@@ -13,10 +13,14 @@ datasource db {
 }
 
 model Users {
-  id String @id 
+  id Int @id @default(autoincrement())
   username String @unique
   pass_word String
   role Int @default(1)
+
+  payment Payment[] 
+  address Address[]
+  review Review[]
 
   user_detail User_detail?
 }
@@ -26,11 +30,9 @@ model User_detail {
   email String 
   phone String
   pin_code String
-  user_ID String @unique 
+  user_ID Int @unique 
 
   user Users @relation(fields: [user_ID], references: [id])
-  payment Payment[] 
-  address Address[]
 }
 
 model Product {
@@ -38,12 +40,12 @@ model Product {
   name String
   price Int
   description String
-  review String
-  rate Int
   offers String
   policy String
   category_ID Int
   brand_ID Int
+
+  review Review[]
 
   category Category @relation(fields: [category_ID], references: [id])
   brand Brand @relation(fields: [brand_ID], references: [id])
@@ -77,26 +79,28 @@ model Payment {
   inc_date DateTime @default(now())
   exp_date DateTime @default(now())
   payment_method_ID Int
-  user_detail_ID Int
+  user_ID Int
 
-  user_detail User_detail @relation(fields: [user_detail_ID], references: [id])
+  user Users @relation(fields: [user_ID], references: [id])
   payment_method Payment_method @relation(fields: [payment_method_ID], references: [id])
 }
 
 model Address {
   id Int @id @default(autoincrement())
   country String
-  district District[]
-  user_detail_ID Int
+  user_ID Int
 
-  user_detail User_detail @relation(fields: [user_detail_ID], references: [id])
+  district District[]
+
+  user Users @relation(fields: [user_ID], references: [id])
 }
 
 model District {
   id Int @id @default(autoincrement())
   name String
-  commune Commune[]
   address_ID Int
+  
+  commune Commune[]
 
   address Address @relation(fields: [address_ID], references: [id])
 }
@@ -107,4 +111,15 @@ model Commune {
   district_ID Int
 
   district District @relation(fields: [district_ID], references: [id])
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  description String
+  rate Int
+  user_ID Int
+  product_ID Int
+
+  product Product @relation(fields: [product_ID], references: [id])
+  user Users @relation(fields: [user_ID], references: [id])
 }

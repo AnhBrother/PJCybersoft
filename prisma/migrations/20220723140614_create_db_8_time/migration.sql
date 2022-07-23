@@ -1,9 +1,9 @@
 -- CreateTable
 CREATE TABLE "Users" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "pass_word" TEXT NOT NULL,
-    "role" TEXT NOT NULL DEFAULT 'basic',
+    "role" INTEGER NOT NULL DEFAULT 1,
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );
@@ -14,7 +14,7 @@ CREATE TABLE "User_detail" (
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "pin_code" TEXT NOT NULL,
-    "user_ID" TEXT NOT NULL,
+    "user_ID" INTEGER NOT NULL,
 
     CONSTRAINT "User_detail_pkey" PRIMARY KEY ("id")
 );
@@ -25,8 +25,6 @@ CREATE TABLE "Product" (
     "name" TEXT NOT NULL,
     "price" INTEGER NOT NULL,
     "description" TEXT NOT NULL,
-    "review" TEXT NOT NULL,
-    "rate" INTEGER NOT NULL,
     "offers" TEXT NOT NULL,
     "policy" TEXT NOT NULL,
     "category_ID" INTEGER NOT NULL,
@@ -67,7 +65,7 @@ CREATE TABLE "Payment" (
     "inc_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "exp_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "payment_method_ID" INTEGER NOT NULL,
-    "user_detail_ID" INTEGER NOT NULL,
+    "user_ID" INTEGER NOT NULL,
 
     CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
 );
@@ -76,7 +74,7 @@ CREATE TABLE "Payment" (
 CREATE TABLE "Address" (
     "id" SERIAL NOT NULL,
     "country" TEXT NOT NULL,
-    "user_detail_ID" INTEGER NOT NULL,
+    "user_ID" INTEGER NOT NULL,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
 );
@@ -99,6 +97,17 @@ CREATE TABLE "Commune" (
     CONSTRAINT "Commune_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Review" (
+    "id" SERIAL NOT NULL,
+    "description" TEXT NOT NULL,
+    "rate" INTEGER NOT NULL,
+    "user_ID" INTEGER NOT NULL,
+    "product_ID" INTEGER NOT NULL,
+
+    CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_username_key" ON "Users"("username");
 
@@ -115,16 +124,22 @@ ALTER TABLE "Product" ADD CONSTRAINT "Product_category_ID_fkey" FOREIGN KEY ("ca
 ALTER TABLE "Product" ADD CONSTRAINT "Product_brand_ID_fkey" FOREIGN KEY ("brand_ID") REFERENCES "Brand"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Payment" ADD CONSTRAINT "Payment_user_detail_ID_fkey" FOREIGN KEY ("user_detail_ID") REFERENCES "User_detail"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_payment_method_ID_fkey" FOREIGN KEY ("payment_method_ID") REFERENCES "Payment_method"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_user_detail_ID_fkey" FOREIGN KEY ("user_detail_ID") REFERENCES "User_detail"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Address" ADD CONSTRAINT "Address_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "District" ADD CONSTRAINT "District_address_ID_fkey" FOREIGN KEY ("address_ID") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Commune" ADD CONSTRAINT "Commune_district_ID_fkey" FOREIGN KEY ("district_ID") REFERENCES "District"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Review" ADD CONSTRAINT "Review_product_ID_fkey" FOREIGN KEY ("product_ID") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

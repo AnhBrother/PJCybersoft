@@ -5,8 +5,8 @@ const brand_router = express.Router()
 
 brand_router.get('/:namebrand', checkRoleUser(1), get_brand)
 brand_router.post('/addBrand', checkRoleUser(2), add_brand)
-brand_router.post('/updBrand', checkRoleUser(2), upd_brand)
-brand_router.post('/delBrand', checkRoleUser(2), del_brand)
+brand_router.put('/updBrand', checkRoleUser(2), upd_brand)
+brand_router.delete('/delBrand', checkRoleUser(2), del_brand)
 
 module.exports = {
     brand_router
