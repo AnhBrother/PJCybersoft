@@ -19,7 +19,7 @@ model Users {
   role Int @default(1)
 
   payment Payment[] 
-  address Address[]
+  country Country[]
   review Review[]
 
   user_detail User_detail?
@@ -27,7 +27,8 @@ model Users {
 
 model User_detail {
   id Int @id @default(autoincrement())
-  email String 
+  email String @unique
+  name String 
   phone String
   pin_code String
   user_ID Int @unique 
@@ -37,7 +38,7 @@ model User_detail {
 
 model Product {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
   price Int
   description String
   offers String
@@ -53,72 +54,70 @@ model Product {
 
 model Category {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
 
   product Product[]
 }
 
 model Brand {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
 
   product Product[]
 }
 
 model Payment_method {
   id Int @id @default(autoincrement())
-  name String
+  name String @unique
 
   payment Payment[]
 }
 
 model Payment {
-  id Int @id @default(autoincrement())
   name String
-  card_number String
+  number String
   inc_date DateTime @default(now())
   exp_date DateTime @default(now())
-  payment_method_ID Int
-  user_ID Int
+  payment_method_ID Int @unique
+  user_ID Int @unique
 
   user Users @relation(fields: [user_ID], references: [id])
   payment_method Payment_method @relation(fields: [payment_method_ID], references: [id])
 }
 
-model Address {
+model Country {
   id Int @id @default(autoincrement())
-  country String
-  user_ID Int
+  name String 
+  user_ID Int @unique
 
-  district District[]
+  city City[]
 
   user Users @relation(fields: [user_ID], references: [id])
+}
+
+model City {
+  id Int @id @default(autoincrement())
+  name String
+  country_ID Int @unique
+  
+  district District[]
+
+  country Country @relation(fields: [country_ID], references: [id])
 }
 
 model District {
   id Int @id @default(autoincrement())
   name String
-  address_ID Int
-  
-  commune Commune[]
+  city_ID Int @unique
 
-  address Address @relation(fields: [address_ID], references: [id])
-}
-
-model Commune {
-  id Int @id @default(autoincrement())
-  name String
-  district_ID Int
-
-  district District @relation(fields: [district_ID], references: [id])
+  city City @relation(fields: [city_ID], references: [id])
 }
 
 model Review {
-  id Int @id @default(autoincrement())
   description String
   rate Int
-  user_ID Int
-  product_ID Int
+  user_ID Int @unique
+  product_ID Int @unique
 
   product Product @relation(fields: [product_ID], references: [id])
   user Users @relation(fields: [user_ID], references: [id])

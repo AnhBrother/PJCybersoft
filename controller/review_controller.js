@@ -146,7 +146,7 @@ const del_review = async (req, res) => {
                 id: true
             }
         })
-        console.log(id_rv)
+        
         if (id_rv != null) {
             const del = await db.review.delete({
                 where:{

@@ -12,6 +12,7 @@ CREATE TABLE "Users" (
 CREATE TABLE "User_detail" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "pin_code" TEXT NOT NULL,
     "user_ID" INTEGER NOT NULL,
@@ -59,60 +60,90 @@ CREATE TABLE "Payment_method" (
 
 -- CreateTable
 CREATE TABLE "Payment" (
-    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "card_number" TEXT NOT NULL,
+    "number" TEXT NOT NULL,
     "inc_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "exp_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "payment_method_ID" INTEGER NOT NULL,
-    "user_ID" INTEGER NOT NULL,
-
-    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
+    "user_ID" INTEGER NOT NULL
 );
 
 -- CreateTable
-CREATE TABLE "Address" (
+CREATE TABLE "Country" (
     "id" SERIAL NOT NULL,
-    "country" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "user_ID" INTEGER NOT NULL,
 
-    CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Country_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "City" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "country_ID" INTEGER NOT NULL,
+
+    CONSTRAINT "City_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "District" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "address_ID" INTEGER NOT NULL,
+    "city_ID" INTEGER NOT NULL,
 
     CONSTRAINT "District_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Commune" (
-    "id" SERIAL NOT NULL,
-    "name" TEXT NOT NULL,
-    "district_ID" INTEGER NOT NULL,
-
-    CONSTRAINT "Commune_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "Review" (
-    "id" SERIAL NOT NULL,
     "description" TEXT NOT NULL,
     "rate" INTEGER NOT NULL,
     "user_ID" INTEGER NOT NULL,
-    "product_ID" INTEGER NOT NULL,
-
-    CONSTRAINT "Review_pkey" PRIMARY KEY ("id")
+    "product_ID" INTEGER NOT NULL
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Users_username_key" ON "Users"("username");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_detail_email_key" ON "User_detail"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_detail_user_ID_key" ON "User_detail"("user_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_name_key" ON "Product"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Brand_name_key" ON "Brand"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Payment_method_name_key" ON "Payment_method"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Payment_payment_method_ID_key" ON "Payment"("payment_method_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Payment_user_ID_key" ON "Payment"("user_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Country_user_ID_key" ON "Country"("user_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "City_country_ID_key" ON "City"("country_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "District_city_ID_key" ON "District"("city_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Review_user_ID_key" ON "Review"("user_ID");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Review_product_ID_key" ON "Review"("product_ID");
 
 -- AddForeignKey
 ALTER TABLE "User_detail" ADD CONSTRAINT "User_detail_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -130,13 +161,13 @@ ALTER TABLE "Payment" ADD CONSTRAINT "Payment_user_ID_fkey" FOREIGN KEY ("user_I
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_payment_method_ID_fkey" FOREIGN KEY ("payment_method_ID") REFERENCES "Payment_method"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Address" ADD CONSTRAINT "Address_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Country" ADD CONSTRAINT "Country_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "District" ADD CONSTRAINT "District_address_ID_fkey" FOREIGN KEY ("address_ID") REFERENCES "Address"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "City" ADD CONSTRAINT "City_country_ID_fkey" FOREIGN KEY ("country_ID") REFERENCES "Country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Commune" ADD CONSTRAINT "Commune_district_ID_fkey" FOREIGN KEY ("district_ID") REFERENCES "District"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "District" ADD CONSTRAINT "District_city_ID_fkey" FOREIGN KEY ("city_ID") REFERENCES "City"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Review" ADD CONSTRAINT "Review_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

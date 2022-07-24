@@ -17,46 +17,54 @@ const get_brand = async (req, res) => {
             res.status(201).send("Brand not exist")
         }
     } catch (error) {
-        res.status(500).send("Key or Brand wrong")
+        res.status(500).send("Server fault")
     }
 }
 
 const add_brand = async (req, res) => {    
-    try {
-        const newbrand = req.body.brand
-
-        const brand_exist = await db.brand.findFirst({
-            where: {
-                name: newbrand,
-            },
-            select:{
-                name: true,
-            }
-        })
-
-        if (brand_exist != null) {
-            res.status(400).send("Brand existed")
-        }else{
-            const data = await db.brand.create({
-                data: {
-                    name: newbrand
-                }
-            })
-            if (data != null) {
-                res.status(200).send("Add sucess")
+    // const newbrand = req.body.brand
+    // if (newbrand == undefined) {
+    //     res.status(500).send("Key wrong")
+    // }else{
+        try {
+            const newbrand = req.body.brand
+            if (newbrand == undefined) {
+                res.status(500).send("Key wrong")
             }else{
-                res.status(201).send("Add error")
-            }
-        }        
-    } catch (error) {        
-        res.status(400).send("Key fault")
-    }
+                const brand_exist = await db.brand.findUnique({
+                    where: {
+                        name: newbrand,
+                    },
+                    select:{
+                        name: true,
+                    }
+                })
+        
+                if (brand_exist != null) {
+                    res.status(400).send("Brand existed")
+                }else{
+                    const data = await db.brand.create({
+                        data: {
+                            name: newbrand
+                        }
+                    })
+                    if (data != null) {
+                        res.status(200).send("Add sucess")
+                    }else{
+                        res.status(201).send("Add error")
+                    }
+                }
+            }                    
+        } catch (error) {        
+            res.status(500).send(error)
+        }
+    //}    
 }
 
 const upd_brand = async (req, res) => {
     const namebrand = req.body
-    if (namebrand.old_name == null) {
-        res.status(400).send("Key fault or brand not exit")
+    if (namebrand.old_name == undefined || namebrand.new_name == undefined) {
+        res.status(400).send("Key wrong")
     } else {
         try {
             const data =  await db.brand.updateMany({
@@ -74,7 +82,7 @@ const upd_brand = async (req, res) => {
                 res.status(201).send('Data not exist')
             }        
         } catch (error) {
-            res.status(400).send("Key fault or brand not exist")
+            res.status(400).send("Server fault")
         }
     }    
 }
@@ -82,7 +90,9 @@ const upd_brand = async (req, res) => {
 const del_brand = async (req, res) => {
     try {
         const namebrand = req.body.name
-
+        if (namebrand == undefined) {
+            res.status(400).send("Key wrong")
+        }
         const data = await db.brand.deleteMany({
             where: {
               name: namebrand,
@@ -95,7 +105,7 @@ const del_brand = async (req, res) => {
             res.status(201).send('Data not exist')
         }
     } catch (error) {
-        res.status(400).send("Key fault or brand not exit")
+        res.status(400).send("Server fault")
     }
 }
 

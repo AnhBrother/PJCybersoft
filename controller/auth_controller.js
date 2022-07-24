@@ -5,7 +5,9 @@ const { generateToken, decodeToken } = require('../helper/jwt.help');
 
 const signin = async (req, res) => {
     const {username, pass_word} = req.body
-
+    if (username == undefined || pass_word == undefined) {
+        res.status(400).send("Key wrong")
+    }
     const user = await db.users.findFirst({
         where:{
             username: username,
@@ -27,8 +29,12 @@ const signin = async (req, res) => {
 }
 
 const signup = async (req, res) => {
-    try {
-        const {username, pass_word, email, phone, pin_code} = req.body
+    const {username, pass_word, email, name, phone, pin_code} = req.body
+
+    if (username == undefined || pass_word == undefined || undefined == email || undefined == name || undefined == phone || undefined == pin_code) {
+        res.status(400).send("Key wrong")
+    }
+    try {        
         const salt = bcrypt.genSaltSync(10)
         const hashPassword = bcrypt.hashSync(pass_word, salt)
         
@@ -42,24 +48,24 @@ const signup = async (req, res) => {
         })
         
         if (userold != null) {
-            res.send("User existed")
-        }else{        
+            res.status(201).send("User existed")
+        }else{
             const user = await db.users.create({
                 data:{
-                    username,
+                    username: username,
                     pass_word:hashPassword
                 }        
             })
-
             const user_detail = await db.user_detail.create({
                 data:{
                     email,
+                    name,
                     phone,
                     pin_code,
                     user_ID: user.id
                 }
             })
-
+    
             if (null != user && null != user_detail) {
                 res.status(201).send({message: 'success', status_code: 201, success: true})
             }else{
@@ -69,6 +75,7 @@ const signup = async (req, res) => {
     } catch (error) {
         res.status(500).send("Key fault")
     }
+    
 }
 
 const checkAuthen = async (req, res, next) => {    
@@ -76,7 +83,7 @@ const checkAuthen = async (req, res, next) => {
         const token = req.headers.authorization
         const decode = decodeToken(token)
         req.user = decode
-        const user = await db.users.findFirst({
+        const user = await db.users.findUnique({
             where:{
                 username: decode.data.username
             }

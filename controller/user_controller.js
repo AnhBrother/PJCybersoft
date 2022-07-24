@@ -1,11 +1,14 @@
 const { db } = require('../config/utils')
 
 const get_user = async (req, res) => {
-    const find_data = req.body.username
+    const {username, pass_word} = req.body
+    if (username == undefined || pass_word == undefined) {
+        res.status(400).send("Key wrong")
+    }
     try {
-        const data = await db.users.findFirst({
+        const data = await db.users.findUnique({
             where:{
-                username: find_data
+                username: req.body.username
             }
         })
         const data_user_detail = await db.user_detail.findUnique({
@@ -14,72 +17,77 @@ const get_user = async (req, res) => {
             },
             select:{
                 email: true,
+                name: true,
                 phone: true
             }
         })
         if (null == data_user_detail) {
-            res.status(200).send('User not found or not update')
+            res.status(201).send('User not found')
         } else {
             res.status(200).send(data_user_detail)
         }
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send("Server fault")
     }
 }
 
 const update_user = async (req, res) => {
-    const inp_data = req.body
+    const {username, pass_word, email, name, phone, pin_code} = req.body
+    if (username == undefined || pass_word == undefined || email == undefined || name == undefined || phone == undefined || pin_code == undefined) {
+        res.status(400).send("Key wrong")
+    }
    
     try {
-        const data = await db.users.findFirst({
+        const data = await db.users.findUnique({
             where:{
-                username: inp_data.username
+                username: username
             },
         })
+        console.log(data.id)
         const upd_user_detail = await db.user_detail.update({
             where:{
                 user_ID: data.id
             },
             data:{
-                email: inp_data.email,
-                phone: inp_data.phone,
-                pin_code: inp_data.pin_code
+                email,
+                name,
+                phone,
+                pin_code
             },
             select:{
                 email: true,
+                name: true,
                 phone: true,
                 pin_code: true
             }
         })
-        console.log(inp_data)
+        console.log(upd_user_detail)
         if (null == upd_user_detail) {
-            res.status(201).send('User not found or not update')
+            res.status(201).send('User not found')
         } else {
             res.status(200).send(upd_user_detail)
         }
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send("Server fault")
     }
 }
 
 const delete_user = async (req, res) => {
     const {username} = req.body 
 
-    if (username == null) {
-        res.status(500).send({message: 'Vui long nhap lai tai khoan', status_code: 401, success: false})
+    if (username == undefined) {
+        res.status(500).send("Key wrong")
     } else {
         try {           
-            const data = await db.users.findFirst({
+            const data = await db.users.findUnique({
                 where: {
                     username: username
                 }
             })
     
-            const index = data.id
-    
             await db.user_detail.delete({
                 where:{
-                    user_ID: index
+                    user_ID: data.id
                 }
             })
     
@@ -91,7 +99,7 @@ const delete_user = async (req, res) => {
             
             res.status(200).send("Delete Success")
         } catch (error) {
-            res.status(500).send({message: 'Vui long nhap lai tai khoan', status_code: 401, success: false})
+            res.status(400).send("Server fault")
         }   
     }
 }
