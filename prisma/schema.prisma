@@ -78,11 +78,13 @@ model Payment {
   number String
   inc_date DateTime @default(now())
   exp_date DateTime @default(now())
-  payment_method_ID Int @unique
-  user_ID Int @unique
+  payment_method_ID Int 
+  user_ID Int 
 
   user Users @relation(fields: [user_ID], references: [id])
   payment_method Payment_method @relation(fields: [payment_method_ID], references: [id])
+
+  @@id([payment_method_ID, user_ID])
 }
 
 model Country {
@@ -116,9 +118,11 @@ model District {
 model Review {
   description String
   rate Int
-  user_ID Int @unique
-  product_ID Int @unique
+  user_ID Int 
+  product_ID Int 
 
   product Product @relation(fields: [product_ID], references: [id])
   user Users @relation(fields: [user_ID], references: [id])
+
+  @@id([user_ID, product_ID])
 }

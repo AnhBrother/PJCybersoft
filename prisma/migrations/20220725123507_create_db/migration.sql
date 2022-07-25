@@ -65,7 +65,9 @@ CREATE TABLE "Payment" (
     "inc_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "exp_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "payment_method_ID" INTEGER NOT NULL,
-    "user_ID" INTEGER NOT NULL
+    "user_ID" INTEGER NOT NULL,
+
+    CONSTRAINT "Payment_pkey" PRIMARY KEY ("payment_method_ID","user_ID")
 );
 
 -- CreateTable
@@ -100,7 +102,9 @@ CREATE TABLE "Review" (
     "description" TEXT NOT NULL,
     "rate" INTEGER NOT NULL,
     "user_ID" INTEGER NOT NULL,
-    "product_ID" INTEGER NOT NULL
+    "product_ID" INTEGER NOT NULL,
+
+    CONSTRAINT "Review_pkey" PRIMARY KEY ("user_ID","product_ID")
 );
 
 -- CreateIndex
@@ -125,12 +129,6 @@ CREATE UNIQUE INDEX "Brand_name_key" ON "Brand"("name");
 CREATE UNIQUE INDEX "Payment_method_name_key" ON "Payment_method"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Payment_payment_method_ID_key" ON "Payment"("payment_method_ID");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Payment_user_ID_key" ON "Payment"("user_ID");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Country_user_ID_key" ON "Country"("user_ID");
 
 -- CreateIndex
@@ -138,12 +136,6 @@ CREATE UNIQUE INDEX "City_country_ID_key" ON "City"("country_ID");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "District_city_ID_key" ON "District"("city_ID");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Review_user_ID_key" ON "Review"("user_ID");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Review_product_ID_key" ON "Review"("product_ID");
 
 -- AddForeignKey
 ALTER TABLE "User_detail" ADD CONSTRAINT "User_detail_user_ID_fkey" FOREIGN KEY ("user_ID") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -4,6 +4,7 @@ const { addr_router } = require('./address_router')
 const { auth_router } = require('./auth_router')
 const { brand_router } = require('./brand_router')
 const { cate_router } = require('./category_router')
+const { payment_method_Router } = require('./payment_method_router')
 const { product_router } = require('./product_router')
 const { review_router } = require('./review_router')
 const { user_router } = require('./user_router')
@@ -16,6 +17,7 @@ rootRouter.use('/category', checkAuthen, cate_router) // success
 rootRouter.use('/brand', checkAuthen, brand_router) // success
 rootRouter.use('/addr', checkAuthen, addr_router)
 rootRouter.use('/review', checkAuthen, review_router)
+rootRouter.use('/payment_method', checkAuthen, payment_method_Router)
 
 module.exports = {
     rootRouter

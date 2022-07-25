@@ -1,85 +1,90 @@
 const { db } = require('../config/utils')
 
 const get_user = async (req, res) => {
-    const {username, pass_word} = req.body
-    if (username == undefined || pass_word == undefined) {
-        res.status(400).send("Key wrong")
-    }
     try {
-        const data = await db.users.findUnique({
-            where:{
-                username: req.body.username
+        const {username, pass_word} = req.body
+
+        if (username == undefined || pass_word == undefined) {
+            res.status(400).send("Key wrong")
+        }else{
+            const data = await db.users.findUnique({
+                where:{
+                    username: req.body.username
+                }
+            })
+            const data_user_detail = await db.user_detail.findUnique({
+                where:{
+                    user_ID: data.id
+                },
+                select:{
+                    email: true,
+                    name: true,
+                    phone: true
+                }
+            })
+
+            if (null == data_user_detail) {
+                res.status(201).send('User not found')
+            } else {
+                res.status(200).send(data_user_detail)
             }
-        })
-        const data_user_detail = await db.user_detail.findUnique({
-            where:{
-                user_ID: data.id
-            },
-            select:{
-                email: true,
-                name: true,
-                phone: true
-            }
-        })
-        if (null == data_user_detail) {
-            res.status(201).send('User not found')
-        } else {
-            res.status(200).send(data_user_detail)
         }
     } catch (error) {
-        res.status(500).send("Server fault")
+        res.status(500).send(error)
     }
 }
 
-const update_user = async (req, res) => {
-    const {username, pass_word, email, name, phone, pin_code} = req.body
-    if (username == undefined || pass_word == undefined || email == undefined || name == undefined || phone == undefined || pin_code == undefined) {
-        res.status(400).send("Key wrong")
-    }
-   
+const update_user = async (req, res) => {   
     try {
-        const data = await db.users.findUnique({
-            where:{
-                username: username
-            },
-        })
-        console.log(data.id)
-        const upd_user_detail = await db.user_detail.update({
-            where:{
-                user_ID: data.id
-            },
-            data:{
-                email,
-                name,
-                phone,
-                pin_code
-            },
-            select:{
-                email: true,
-                name: true,
-                phone: true,
-                pin_code: true
+        const {username, pass_word, email, name, phone, pin_code} = req.body
+
+        if (username == undefined || pass_word == undefined || email == undefined || name == undefined || phone == undefined || pin_code == undefined) {
+            res.status(400).send("Key wrong")
+        }else{
+            const data = await db.users.findUnique({
+                where:{
+                    username: username
+                },
+            })
+            
+            const upd_user_detail = await db.user_detail.update({
+                where:{
+                    user_ID: data.id
+                },
+                data:{
+                    email,
+                    name,
+                    phone,
+                    pin_code
+                },
+                select:{
+                    email: true,
+                    name: true,
+                    phone: true,
+                    pin_code: true
+                }
+            })
+            
+            if (null == upd_user_detail) {
+                res.status(201).send("Update fault")
+            } else {
+                res.status(200).send("Update success")
             }
-        })
-        console.log(upd_user_detail)
-        if (null == upd_user_detail) {
-            res.status(201).send('User not found')
-        } else {
-            res.status(200).send(upd_user_detail)
         }
+        
     } catch (error) {
-        res.status(500).send("Server fault")
+        res.status(500).send(error)
     }
 }
 
 const delete_user = async (req, res) => {
-    const {username} = req.body 
+    try {    
+        const {username} = req.body 
 
-    if (username == undefined) {
-        res.status(500).send("Key wrong")
-    } else {
-        try {           
-            const data = await db.users.findUnique({
+        if (username == undefined) {
+            res.status(400).send("Key wrong")
+        } else {       
+            const find_user = await db.users.findUnique({
                 where: {
                     username: username
                 }
@@ -87,21 +92,25 @@ const delete_user = async (req, res) => {
     
             await db.user_detail.delete({
                 where:{
-                    user_ID: data.id
+                    user_ID: find_user.id
                 }
             })
     
-            await db.users.delete({
+            const data = await db.users.delete({
                 where:{
-                    username : username
+                    username: username
                 }
             })
             
-            res.status(200).send("Delete Success")
-        } catch (error) {
-            res.status(400).send("Server fault")
-        }   
-    }
+            if (data == null) {
+                res.status(201).send("Delete fault") 
+            } else {
+                res.status(200).send("Delete success")   
+            }            
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }     
 }
 
 module.exports = {

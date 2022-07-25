@@ -4,27 +4,31 @@ const { db } = require('../config/utils');
 const { generateToken, decodeToken } = require('../helper/jwt.help');
 
 const signin = async (req, res) => {
-    const {username, pass_word} = req.body
-    if (username == undefined || pass_word == undefined) {
-        res.status(400).send("Key wrong")
-    }
-    const user = await db.users.findFirst({
-        where:{
-            username: username,
+    try {
+        const {username, pass_word} = req.body
+        if (username == undefined || pass_word == undefined) {
+            res.status(400).send("Key wrong")
         }
-    })
-    
-    if (user) {
-        const isSuccess = bcrypt.compareSync(pass_word, user.pass_word)
-        if (isSuccess) {  
-            const token = generateToken(user)
-            res.status(200).send({message: 'Sign in success', status_code: 200, success: true, access_token: token})
-        }else{
-            res.status(401).send({message: 'Vui long nhap lai mat khau', status_code: 401, success: false})
+        const user = await db.users.findFirst({
+            where:{
+                username: username,
+            }
+        })
+        
+        if (user) {
+            const isSuccess = bcrypt.compareSync(pass_word, user.pass_word)
+            if (isSuccess) {  
+                const token = generateToken(user)
+                res.status(200).send({message: 'Sign in success', status_code: 200, success: true, access_token: token})
+            }else{
+                res.status(401).send({message: 'Vui long nhap lai mat khau', status_code: 401, success: false})
+            }
         }
-    }
-    else{
-        res.status(401).send({message: 'Vui long nhap lai tai khoan', status_code: 201, success: false})
+        else{
+            res.status(401).send({message: 'Vui long nhap lai tai khoan', status_code: 201, success: false})
+        }
+    } catch (error) {
+        res.send(error)
     }
 }
 

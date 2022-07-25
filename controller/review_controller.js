@@ -2,56 +2,60 @@ const { db } = require("../config/utils");
 const { decodeToken } = require("../helper/jwt.help");
 
 const get_review = async (req, res) => {
-    const name = req.params.nameProd
-    if (name == null) {
-        res.status(400).send("Key wrong")
-    }
     try {
-        const data = await db.product.findFirst({
-            where:{
-                name: name
-            },
-            select:{
-                name: true,
-                price: true,
-                description: true,
-                offers: true,
-                policy: true
+        const name = req.params.nameProd
+
+        if (name == null) {
+            res.status(400).send("Key wrong")
+        }else{
+            const data = await db.product.findFirst({
+                where:{
+                    name: name
+                },
+                select:{
+                    name: true,
+                    price: true,
+                    description: true,
+                    offers: true,
+                    policy: true
+                }
+            })
+
+            if (data) {
+                res.status(200).send(data)
+            } else {
+                res.status(201).send("Product not exist")
             }
-        })
-        if (data) {
-            res.status(200).send(data)
-        } else {
-            res.status(201).send("Product not exist")
         }
     } catch (error) {
-        res.status(400).send("Key or value fault")
+        res.status(500).send(error)
     }
 }
 
 const add_review = async (req, res) => {
-    const review = req.body 
-    const token = req.headers.authorization
-    const decode = decodeToken(token)
-
-    if (review.description == null || review.rate == null || review.product == null) {
-        res.status(400).send("Key wrong")
-    }else {
-        const id_rv = await db.review.findFirst({
-            where:{
-                user_ID: decode.data.id,
-                product:{
-                    name: review.product
+    try {
+        const review = req.body 
+        const token = req.headers.authorization
+        const decode = decodeToken(token)
+    
+        if (review.description == null || review.rate == null || review.product == null) {
+            res.status(400).send("Key wrong")
+        }else {
+            const id_rv = await db.review.findFirst({
+                where:{
+                    user_ID: decode.data.id,
+                    product:{
+                        name: review.product
+                    }
+                },
+                select:{
+                    id: true
                 }
-            },
-            select:{
-                id: true
-            }
-        })
-        if (id_rv != null) {
-            res.status(201).send("Review was created")
-        } else {
-            try {
+            })
+    
+            if (id_rv != null) {
+                res.status(201).send("Review was created")
+            } else {
                 const find_prod = await db.product.findFirst({
                     where:{
                         name: review.product
@@ -68,101 +72,105 @@ const add_review = async (req, res) => {
                             product_ID: find_prod.id
                         }
                     })
+
                     if (data) {
                         res.status(200).send("Add success")
                     } else {
                         res.status(201).send("Add fault")
                     }
                 }        
-            } catch (error) {
-                res.status(400).send("Value wrong")
-            }
-        }
+            } 
+        } 
+    } catch (error) {
+        res.status(500).send(error)
     }
 }
 
 const upd_review = async (req, res) => {
-    const review = req.body
-    const token = req.headers.authorization
-    const decode = decodeToken(token)
-
-    if (review.description == null || review.rate == null || review.product == null) {
-        res.status(400).send("Key wrong")
-    }
     try {
-        const id_rv = await db.review.findFirst({
-            where:{
-                user_ID: decode.data.id,
-                product:{
-                    name: review.product
-                }
-            },
-            select:{
-                id: true
-            }
-        })
-
-        if (id_rv != null) {
-            const update = await db.review.update({
+        const review = req.body
+        const token = req.headers.authorization
+        const decode = decodeToken(token)
+    
+        if (review.description == null || review.rate == null || review.product == null) {
+            res.status(400).send("Key wrong")
+        }else{
+            const id_rv = await db.review.findFirst({
                 where:{
-                    id: id_rv.id
+                    user_ID: decode.data.id,
+                    product:{
+                        name: review.product
+                    }
                 },
-                data:{
-                    description: review.description,
-                    rate: review.rate
+                select:{
+                    id: true
                 }
             })
-
-            if (update) {
-                res.status(200).send("Update success")
-            } else {
-                res.status(201).send("Update fault")
+    
+            if (id_rv == null) {
+                res.status(400).send("Review not exist")
+            }else{
+                const update = await db.review.update({
+                    where:{
+                        id: id_rv.id
+                    },
+                    data:{
+                        description: review.description,
+                        rate: review.rate
+                    }
+                })
+    
+                if (update) {
+                    res.status(200).send("Update success")
+                } else {
+                    res.status(201).send("Update fault")
+                }
             }
-        }else{
-            res.status(201).send("Review not exist")
         }    
     } catch (error) {
-        res.status(400).send("Key fault")
+        res.status(500).send(error)
     }
 }
 
 const del_review = async (req, res) => {
-    const review = req.body
-    const token = req.headers.authorization
-    const decode = decodeToken(token)
-
-    if (review.product == null) {
-        res.status(400).send("Key wrong")
-    }
     try {
-        const id_rv = await db.review.findFirst({
-            where:{
-                user_ID: decode.data.id,
-                product:{
-                    name: review.product
-                }
-            },
-            select:{
-                id: true
-            }
-        })
-        
-        if (id_rv != null) {
-            const del = await db.review.delete({
+        const review = req.body
+        const token = req.headers.authorization
+        const decode = decodeToken(token)
+    
+        if (review.product == null) {
+            res.status(400).send("Key wrong")
+        }else{        
+            const id_rv = await db.review.findFirst({
                 where:{
-                    id: id_rv.id
+                    user_ID: decode.data.id,
+                    product:{
+                        name: review.product
+                    }
+                },
+                select:{
+                    id: true
                 }
             })
-            if (del) {
-                res.status(200).send("Delete success")
-            } else {
-                res.status(201).send("Delete fault")
-            }
-        }else{
-            res.status(201).send("Review not exist")
-        }    
+            
+            if (id_rv = null) {
+                res.status(400).send("Review not exist")
+            }else{
+                const del = await db.review.delete({
+                    where:{
+                        id: id_rv.id
+                    }
+                })
+
+                if (del) {
+                    res.status(200).send("Delete success")
+                } else {
+                    res.status(201).send("Delete fault")
+                }
+            }   
+        } 
     } catch (error) {
-        res.status(400).send("Key fault")
+        res.status(500).send(error)
     }
 }
 
