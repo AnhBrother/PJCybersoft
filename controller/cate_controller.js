@@ -1,5 +1,22 @@
 const { db } = require("../config/utils")
 
+const get_All_cate = async (req, res) => {
+    try {
+        const get_All_data = await db.category.findMany({
+            select:{
+                name: true
+            }
+        })
+        if (get_All_data != null || get_All_data == []) {
+            res.status(201).send(get_All_data)
+        } else {            
+            res.status(202).send("No data exist")
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+}
+
 const get_Cate = async (req, res) => {
     try {
         const name_cate = req.params.namecate
@@ -57,29 +74,29 @@ const add_Cate = async (req, res) => {
 
 const update_Cate = async (req, res) => {
     try {
-        const nameCate = req.body
-
-        if (nameCate.old_name == undefined || newCate.new_name == undefined) {
+        const {old_name,new_name}  = req.body
+        
+        if (old_name == undefined || new_name == undefined) {
+            console.log(old_name)
             res.status(400).send("Key wrong")
-        } else {
+        } else {            
             const data = await db.category.updateMany({
                 where:{
-                    name: nameCate.old_name,
+                    name: old_name,
                 },
                 data:{
-                    name: nameCate.new_name
+                    name: new_name
                 }
             })
-    
+
             if (data.count != 0) {
                 res.status(200).send('Update Category success')
             }else{
                 res.status(201).send('Data not exist')
             }
-        }
-
-                  
+        }                  
     } catch (error) {
+        console.log("he")
         res.status(500).send(error)
     }
 }
@@ -109,6 +126,7 @@ const delete_Cate = async (req, res) => {
 }
 
 module.exports = {
+    get_All_cate,
     get_Cate,
     add_Cate,
     update_Cate,

@@ -1,22 +1,18 @@
-const e = require("express");
 const { db } = require("../config/utils");
+const { decodeToken } = require("../helper/jwt.help");
+
 
 const getPaymentMethod = async (req, res) => {
     try {
-        const data = req.params.getPaymentMethod
-        if (data == null) {
-            res.status(400).send("Key wrong")
-        }else {
-            const get_data = await db.payment_method.findUnique({
-                where:{
-                    name: data
-                }
-            })
-            if (get_data != null) {
-                res.status(200).send(get_data)
-            } else {
-                res.status(201).send("Payment method not exist")
+        const get_data = await db.payment_method.findMany({
+            select:{
+                name: true
             }
+        })
+        if (get_data != null) {
+            res.status(200).send(get_data)
+        } else {
+            res.status(201).send("No payment method")
         }
     } catch (error) {
         res.status(500).send(error)

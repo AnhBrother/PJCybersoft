@@ -4,7 +4,7 @@ const get_Product = async (req, res) => {
     try {
         const name = req.params.nameProd
 
-        if (name == null) {
+        if (name == undefined) {
             res.status(400).send("Key wrong")
         }else{
             const data = await db.product.findUnique({
@@ -36,7 +36,7 @@ const create_Prod = async (req, res) => {
     try {
         const {name, price, description, offers, policy, brand, cate} = req.body
 
-        if (name == null || price == null || description == null || offers == null || policy == null || brand == null || cate == null) {
+        if (name == undefined || price == undefined || description == undefined || offers == undefined || policy == undefined || brand == undefined || cate == undefined) {
             res.status(400).send("Key wrong")
         }else{
             const brand_exist = await db.brand.findUnique({
@@ -103,7 +103,7 @@ const upd_Product = async (req, res) => {
     try {
         const upd_cate = req.body
 
-        if (upd_cate.name == null || upd_cate.price == null || upd_cate.description == null || upd_cate.offers == null || upd_cate.policy == null || upd_cate.brand == null || upd_cate.cate == null) {
+        if (upd_cate.name == undefined || upd_cate.price == undefined || upd_cate.description == undefined || upd_cate.offers == undefined || upd_cate.policy == undefined|| upd_cate.brand == undefined || upd_cate.cate == undefined) {
             res.status(400).send("Key wrong")
         }else {
             const brand_exist = await db.brand.findUnique({
@@ -162,7 +162,7 @@ const del_Product = async (req, res) => {
     try {
         const name_prod = req.body.name
 
-        if (name_prod == null) {
+        if (name_prod == undefined) {
             res.status(400).send("Key wrong")
         }else{
             const del_prod = await db.product.deleteMany({

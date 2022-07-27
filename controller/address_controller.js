@@ -1,4 +1,3 @@
-const express = require('express')
 const { db } = require('../config/utils')
 const { decodeToken } = require('../helper/jwt.help')
 
@@ -6,39 +5,45 @@ const get_Addr = async (req, res) => {
     try {
         const token = req.headers.authorization
         const decode = decodeToken(token)
-        console.log(decode)
-    
+        
         const find_addr = await db.country.findUnique({
             where:{
                 user_ID: decode.data.id
             },
             select:{
-                country: true
-            }
-        })
-        const find_dict = await db.district.findUnique({
-            where:{
-                address_ID: find_addr.id
-            },
-            select:{
+                id: true,
                 name: true
             }
         })
-        const find_commu = await db.commune.findUnique({
-            where:{
-                district_ID: find_dict.id
-            },
-            select:{
-                name: true
-            }
-        })
-        
-        const data = [...[], find_addr, find_dict, find_commu]
-        if (find_addr != null && find_dict != null && find_commu != null) {
-            res.status(200).send(data)
+        if (find_addr == null) {
+            res.status(400).send("Address not create")
         } else {
-            res.status(201).send("No data")
-        }        
+            const find_dict = await db.city.findUnique({
+                where:{
+                    country_ID: find_addr.id
+                },
+                select:{
+                    id: true,
+                    name: true
+                }
+            })
+            const find_commu = await db.district.findUnique({
+                where:{
+                    city_ID: find_dict.id
+                },
+                select:{
+                    id: true,
+                    name: true
+                }
+            })        
+            const data = [...[], find_addr.name, find_dict.name, find_commu.name]
+            if (find_addr != null && find_dict != null && find_commu != null) {
+                
+                res.status(200).send(data)
+            } else {
+                res.status(201).send("No data")
+            }  
+        }       
     } catch (error) {
         res.status(500).send(error)
     }
@@ -155,32 +160,49 @@ const upd_Addr = async (req, res) => {
 }
 
 const del_Addr = async (req, res) => {
-    res.send("hello")
-    // try {
-    //     const addr = req.body
-    //     const token = req.headers.authorization
-    //     const decode = decodeToken(token)
+    try {
+        const addr = req.body
+        const token = req.headers.authorization
+        const decode = decodeToken(token)
     
-    //     if (addr.country == undefined || addr.city == undefined || addr.district == undefined) {
-    //         res.status(400).send("Key wrong")
-    //     }else{
-    //         const find_user = await db.users.findUnique({
-    //             where:{
-    //                 id: decode.data.id
-    //             },
-    //             select:{
-    //                 id: true
-    //             }
-    //         })
-    //         const dele_commu = await db.district.delete({
-    //             where:{
+        if (addr.country == undefined || addr.city == undefined || addr.district == undefined) {
+            res.status(400).send("Key wrong")
+        }else{
+            const find_country =await db.country.findUnique({
+                where:{
+                    user_ID: decode.data.id
+                }
+            })
+            const find_city = await db.city.findUnique({
+                where:{
+                    country_ID: find_country.id
+                }
+            })
+            const del_dict = await db.district.delete({
+                where:{
+                    city_ID: find_city.id
+                }
+            })
+            const del_city = await db.city.delete({
+                where:{
+                    country_ID: find_country.id
+                }
+            })
+            const del_country = await db.country.delete({
+                where:{
+                    user_ID: decode.data.id
+                }
+            })
 
-    //             }
-    //         })
-    //     }        
-    // } catch (error) {
-    //     res.status(500).send(error)
-    // }
+            if (del_dict == null || del_city == null || del_country == null) {
+                res.status(201).send("Delete fault")
+            } else {
+                res.status(200).send("Delete success")
+            }
+        }        
+    } catch (error) {
+        res.status(500).send(error)
+    }
 }
 
 module.exports = {
