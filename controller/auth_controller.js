@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const { db } = require('../config/utils');
-
 const { generateToken, decodeToken } = require('../helper/jwt.help');
 
 const signin = async (req, res) => {
