@@ -8,9 +8,9 @@ const get_All_brand = async (req, res) => {
             }
         })
         if (get_All_data != null || get_All_data != []) {
-            res.status(201).send(get_All_data)
+            res.status(201).send({message: 'success', status_code: 200, success: true, data: get_All_data})
         } else {
-            res.status(202).send("No data exist")
+            res.status(202).send({message: 'fault', status_code: 202, success: true, data: 'No data'})
         }
     } catch (error) {
         res.status(500).send(error)
@@ -29,9 +29,9 @@ const get_brand = async (req, res) => {
                 }
             })
             if (get_data != null) {
-                res.status(201).send(get_data)
+                res.status(201).send({message: 'success', status_code: 200, success: true, data: get_data})
             } else {
-                res.status(202).send("Brand not exist")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }
     } catch (error) {
@@ -55,7 +55,7 @@ const add_brand = async (req, res) => {
             })
     
             if (brand_exist != null) {
-                res.status(400).send("Brand existed")
+                res.status(400).send({message: 'Brand existed'})
             }else{
                 const data = await db.brand.create({
                     data: {
@@ -63,9 +63,9 @@ const add_brand = async (req, res) => {
                     }
                 })
                 if (data != null) {
-                    res.status(201).send("Add sucess")
+                    res.status(201).send({message: 'success', status_code: 201, success: true})
                 }else{
-                    res.status(202).send("Add fault")
+                    res.status(202).send({message: 'fail', status_code: 202, success: false})
                 }
             }
         }                    
@@ -90,9 +90,9 @@ const upd_brand = async (req, res) => {
             })
             
             if (data.count != 0) {
-                res.status(201).send('Update Brand success')
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }else{
-                res.status(202).send('Brand not exist')
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }
     } catch (error) {
@@ -113,9 +113,9 @@ const del_brand = async (req, res) => {
         })
         
         if (data.count != 0) {
-            res.status(201).send('Delete brand success')
+            res.status(200).send({message: 'success', status_code: 200, success: true})
         }else{
-            res.status(202).send('Data not exist')
+            res.status(202).send({message: 'fail', status_code: 202, success: false})
         }
     } catch (error) {
         res.status(500).send(error)

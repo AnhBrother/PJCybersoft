@@ -13,9 +13,9 @@ const getPayment = async (req, res) => {
         })
 
         if (data ==  null) {
-            res.status(201).send("Payment not create")
+            res.status(202).send({message: 'fail', status_code: 202, success: false})
         } else {
-            res.status(200).send(data)
+            res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
         }
     } catch (error) {
         res.status(500).send(error)
@@ -41,7 +41,7 @@ const addPayment = async (req, res) => {
             })
             
             if (payment_method_exist == null) {
-                res.status(400).send("Payment method not exist")
+                res.status(400).send({message: 'Payment method not exist'})
             } else {
                 const payment_exist = await db.payment.findMany({
                     where:{
@@ -51,7 +51,7 @@ const addPayment = async (req, res) => {
                 })
                 
                 if (payment_exist == [] || payment_exist) {
-                    res.status(201).send("Payment existed")
+                    res.status(201).send({message: 'Payment existed'})
                 } else {
                     console.log(payment_exist)
                     const data = await db.payment.create({
@@ -64,9 +64,9 @@ const addPayment = async (req, res) => {
                     })
                     
                     if (data != null) {
-                        res.status(200).send("Add success")
+                        res.status(201).send({message: 'success', status_code: 201, success: true, data: data})
                     } else {
-                        res.status(201).send("Add fault")
+                        res.status(202).send({message: 'fail', status_code: 202, success: false})
                     }
                 }
             }
@@ -99,9 +99,9 @@ const updPayment = async (req, res) => {
             })
 
             if (data == null) {
-                res.status(400).send("Payment not exist")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(200).send("Update success")
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }
         }
     } catch (error) {
@@ -132,9 +132,9 @@ const delPayment = async (req, res) => {
             })
             
             if (data.count == 0) {
-                res.status(201).send("Delete fualt")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(200).send("Delete success")
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }
         }
     } catch (error) {

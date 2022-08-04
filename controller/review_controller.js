@@ -22,9 +22,9 @@ const get_review = async (req, res) => {
             })
 
             if (data) {
-                res.status(200).send(data)
+                res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
             } else {
-                res.status(201).send("Product not exist")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }
     } catch (error) {
@@ -74,9 +74,9 @@ const add_review = async (req, res) => {
                     })
 
                     if (data) {
-                        res.status(200).send("Add success")
+                        res.status(201).send({message: 'success', status_code: 201, success: true, data: data})
                     } else {
-                        res.status(201).send("Add fault")
+                        res.status(202).send({message: 'fail', status_code: 202, success: false})
                     }
                 }        
             } 
@@ -121,9 +121,9 @@ const upd_review = async (req, res) => {
                 })
     
                 if (update) {
-                    res.status(200).send("Update success")
+                    res.status(200).send({message: 'success', status_code: 200, success: true})
                 } else {
-                    res.status(201).send("Update fault")
+                    res.status(202).send({message: 'fail', status_code: 202, success: false})
                 }
             }
         }    
@@ -163,9 +163,9 @@ const del_review = async (req, res) => {
                 })
 
                 if (del) {
-                    res.status(200).send("Delete success")
+                    res.status(200).send({message: 'success', status_code: 200, success: true})
                 } else {
-                    res.status(201).send("Delete fault")
+                    res.status(202).send({message: 'fail', status_code: 202, success: false})
                 }
             }   
         } 

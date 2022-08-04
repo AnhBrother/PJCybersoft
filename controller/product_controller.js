@@ -1,5 +1,23 @@
 const { db } = require('../config/utils')
 
+const get_All_prod = async (req, res) => {
+    try {
+        const get_All_data = await db.product.findMany({
+            select:{
+                name: true
+            }
+        })
+        
+        if (get_All_data != null || get_All_data != []) {
+            res.status(200).send({message: 'success', status_code: 200, success: true, data: get_All_data})
+        } else {
+            res.status(202).send({message: 'fault', status_code: 202, success: true, data: 'No data'})
+        }
+    } catch (error) {
+        res.status(500).send(error)
+    }
+}
+
 const get_Product = async (req, res) => {
     try {
         const name = req.params.nameProd
@@ -21,9 +39,9 @@ const get_Product = async (req, res) => {
             })
             
             if (data) {
-                res.status(200).send(data)
+                res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
             } else {
-                res.status(201).send("Product not exist")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }        
     } catch (error) {
@@ -44,9 +62,9 @@ const create_Prod = async (req, res) => {
                     name: brand
                 }
             })
-            
+
             if (brand_exist == null) {
-                res.status(400).send("Brand not exist")
+                res.status(400).send({message: 'Brand not exist'})
             }else{
                 const cate_exist = await db.category.findUnique({
                     where:{
@@ -55,7 +73,7 @@ const create_Prod = async (req, res) => {
                 })
                 
                 if (cate_exist == null) {
-                    res.status(400).send("Cate not exist")
+                    res.status(400).send({message: 'Cate not exist'})
                 }else{
                     const prod_exist = await db.product.findUnique({
                         where:{
@@ -64,9 +82,9 @@ const create_Prod = async (req, res) => {
                     })
 
                     if (prod_exist != null) {
-                        res.status(400).send("Product existed")
+                        res.status(400).send({message: 'Product existed'})
                     } else {
-                        const prod = await db.product.createMany({
+                        const prod = await db.product.create({
                             data:{
                                 name, 
                                 price, 
@@ -84,11 +102,11 @@ const create_Prod = async (req, res) => {
                                 policy: true
                             }
                         })
-
-                        if (prod) {
-                            res.status(200).send(prod)
+                        
+                        if (prod != null) {
+                            res.status(201).send({message: 'success', status_code: 201, success: true, data: prod})
                         }else{
-                            res.status(201).send('Add fail')
+                            res.status(202).send({message: 'fail', status_code: 202, success: false})
                         }
                     }                
                 }  
@@ -146,9 +164,9 @@ const upd_Product = async (req, res) => {
                     })
                     
                     if (data.count != 0) {
-                        res.status(200).send('Update success')
+                        res.status(200).send({message: 'success', status_code: 200, success: true})
                     }else{
-                        res.status(201).send('Data not exist')
+                        res.status(202).send({message: 'fail', status_code: 202, success: false})
                     } 
                 }
             }   
@@ -172,9 +190,9 @@ const del_Product = async (req, res) => {
             })
             
             if (del_prod.count != 0) {
-                res.status(200).send("Delete success")
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             } else {
-                res.status(201).send("Value wrong")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }        
     } catch (error) {
@@ -183,6 +201,7 @@ const del_Product = async (req, res) => {
 }
 
 module.exports = {
+    get_All_prod,
     get_Product,
     create_Prod,
     upd_Product,

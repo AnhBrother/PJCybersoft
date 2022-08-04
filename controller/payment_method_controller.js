@@ -1,5 +1,4 @@
 const { db } = require("../config/utils");
-const { decodeToken } = require("../helper/jwt.help");
 
 
 const getPaymentMethod = async (req, res) => {
@@ -10,9 +9,9 @@ const getPaymentMethod = async (req, res) => {
             }
         })
         if (get_data != null) {
-            res.status(200).send(get_data)
+            res.status(200).send({message: 'success', status_code: 200, success: true, data: get_data})
         } else {
-            res.status(201).send("No payment method")
+            res.status(202).send({message: 'fail', status_code: 202, success: false})
         }
     } catch (error) {
         res.status(500).send(error)
@@ -35,7 +34,7 @@ const addPaymentMethod = async (req, res) => {
             })
     
             if (paymentMethod_exist != null) {
-                res.status(400).send("Payment Method existed")
+                res.status(400).send({message: 'Payment Method existed'})
             }else{
                 const data = await db.payment_method.create({
                     data: {
@@ -43,9 +42,9 @@ const addPaymentMethod = async (req, res) => {
                     }
                 })
                 if (data != null) {
-                    res.status(200).send("Add sucess")
+                    res.status(201).send({message: 'success', status_code: 201, success: true, data: data})
                 }else{
-                    res.status(201).send("Add error")
+                    res.status(202).send({message: 'fail', status_code: 202, success: false})
                 }
             }
         }                    
@@ -71,9 +70,9 @@ const updPaymentMethod = async (req, res) => {
             })
 
             if (data.count != 0) {
-                res.status(200).send('Update payment method success')
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }else{
-                res.status(201).send('Data not exist')
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }
     } catch (error) {
@@ -94,9 +93,9 @@ const delPaymentMethod = async (req, res) => {
         })
         
         if (data.count != 0) {
-            res.status(200).send('Delete payment method success')
+            res.status(200).send({message: 'success', status_code: 200, success: true})
         }else{
-            res.status(201).send('Data not exist')
+            res.status(202).send({message: 'fail', status_code: 202, success: false})
         }
     } catch (error) {
         res.status(500).send(error)

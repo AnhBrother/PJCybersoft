@@ -24,9 +24,9 @@ const get_user = async (req, res) => {
             })
 
             if (null == data_user_detail) {
-                res.status(202).send('User not found')
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(201).send(data_user_detail)
+                res.status(200).send({message: 'success', status_code: 200, success: true, data: data_user_detail})
             }
         }
     } catch (error) {
@@ -66,9 +66,9 @@ const update_user = async (req, res) => {
             })
             
             if (null == upd_user_detail) {
-                res.status(202).send("Update fault")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(201).send("Update success")
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }
         }
         
@@ -103,9 +103,9 @@ const delete_user = async (req, res) => {
             })
             
             if (data == null) {
-                res.status(202).send("Delete fault") 
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(201).send("Delete success")   
+                res.status(200).send({message: 'success', status_code: 200, success: true})   
             }            
         }
     } catch (error) {

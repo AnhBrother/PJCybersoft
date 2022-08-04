@@ -16,7 +16,7 @@ const get_Addr = async (req, res) => {
             }
         })
         if (find_addr == null) {
-            res.status(400).send("Address not create")
+            res.status(400).send({message: 'Address not create'})
         } else {
             const find_dict = await db.city.findUnique({
                 where:{
@@ -39,9 +39,9 @@ const get_Addr = async (req, res) => {
             const data = [...[], find_addr.name, find_dict.name, find_commu.name]
             if (find_addr != null && find_dict != null && find_commu != null) {
                 
-                res.status(200).send(data)
+                res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
             } else {
-                res.status(201).send("No data")
+                res.status(202).send({message: 'fail', status_code: 202, success: false, data: 'No data'})
             }  
         }       
     } catch (error) {
@@ -75,7 +75,7 @@ const add_Addr = async (req, res) => {
                 }
             })
             if (user_addr != null) {
-                res.status(201).send("Address created")
+                res.status(201).send({message: 'Address created'})
             } else {
                 const add_country = await db.country.create({
                     data:{
@@ -96,9 +96,9 @@ const add_Addr = async (req, res) => {
                     }
                 })
                 if (add_country == null ||  add_city == null || add_district == null) {
-                    res.status(201).send("Add fault")
+                    res.status(202).send({message: 'fail', status_code: 202, success: false})
                 } else {
-                    res.status(200).send("Add success")
+                    res.status(201).send({message: 'success', status_code: 201, success: true})
                 }
             }
         }        
@@ -149,9 +149,9 @@ const upd_Addr = async (req, res) => {
                 }
             })
             if (add_country == null ||  add_city == null || add_district == null) {
-                res.status(201).send("Update fault")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(200).send("Update success")
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }
         }        
     } catch (error) {
@@ -195,9 +195,9 @@ const del_Addr = async (req, res) => {
             })
 
             if (del_dict == null || del_city == null || del_country == null) {
-                res.status(201).send("Delete fault")
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
-                res.status(200).send("Delete success")
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }
         }        
     } catch (error) {

@@ -8,9 +8,9 @@ const get_All_cate = async (req, res) => {
             }
         })
         if (get_All_data != null || get_All_data == []) {
-            res.status(201).send(get_All_data)
+            res.status(200).send({message: 'success', status_code: 200, success: true, data: get_All_data})
         } else {            
-            res.status(202).send("No data exist")
+            res.status(202).send({message: 'No data exist'})
         }
     } catch (error) {
         res.status(500).send(error)
@@ -27,9 +27,9 @@ const get_Cate = async (req, res) => {
         })
     
         if (null == data) {
-            res.status(400).send('Category not found or not update')
+            res.status(202).send({message: 'fail', status_code: 202, success: false})
         } else {
-            res.status(200).send(data)
+            res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
         }
     } catch (error) {
         res.status(500).send(error)
@@ -53,7 +53,7 @@ const add_Cate = async (req, res) => {
             })
             
             if (cate_exist) {
-                res.status(400).send("Category exist")
+                res.status(400).send({message: 'Category exist'})
             } else {
                 const data = await db.category.create({
                     data:{
@@ -61,9 +61,9 @@ const add_Cate = async (req, res) => {
                     }
                 })
                 if (null == data) {
-                    res.status(201).send('Add Category fault')
+                    res.status(202).send({message: 'fail', status_code: 202, success: false})
                 } else {
-                    res.status(200).send('Add Category success')
+                    res.status(201).send({message: 'success', status_code: 201, success: true, data: data})
                 }
             }
         }
@@ -90,9 +90,9 @@ const update_Cate = async (req, res) => {
             })
 
             if (data.count != 0) {
-                res.status(200).send('Update Category success')
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }else{
-                res.status(201).send('Data not exist')
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
         }                  
     } catch (error) {
@@ -115,9 +115,9 @@ const delete_Cate = async (req, res) => {
             })
             
             if (data.count != 0) {
-                res.status(200).send('Delete Category success')
+                res.status(200).send({message: 'success', status_code: 200, success: true})
             }else{
-                res.status(201).send('Data not exist')
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }  
         }       
     } catch (error) {
