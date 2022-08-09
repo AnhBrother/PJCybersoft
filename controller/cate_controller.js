@@ -80,7 +80,7 @@ const update_Cate = async (req, res) => {
             console.log(old_name)
             res.status(400).send("Key wrong")
         } else {            
-            const data = await db.category.updateMany({
+            const data = await db.category.update({
                 where:{
                     name: old_name,
                 },
@@ -96,7 +96,6 @@ const update_Cate = async (req, res) => {
             }
         }                  
     } catch (error) {
-        console.log("he")
         res.status(500).send(error)
     }
 }
@@ -108,7 +107,7 @@ const delete_Cate = async (req, res) => {
         if (nameCate == undefined) {
             res.status(400).send("Key wrong")
         } else {
-            const data = await db.category.deleteMany({
+            const data = await db.category.delete({
                 where: {
                   name: nameCate,
                 }

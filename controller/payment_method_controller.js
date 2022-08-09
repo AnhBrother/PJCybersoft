@@ -60,7 +60,7 @@ const updPaymentMethod = async (req, res) => {
         if (name.old_name == undefined || name.new_name == undefined) {
             res.status(400).send("Key wrong")
         } else {
-            const data =  await db.payment_method.updateMany({
+            const data =  await db.payment_method.update({
                 where:{
                     name: name.old_name
                 },

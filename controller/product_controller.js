@@ -142,7 +142,7 @@ const upd_Product = async (req, res) => {
                 if (cate_exist == null) {
                     res.status(400).send("Cate not exist")
                 }else{
-                    const data =  await db.product.updateMany({
+                    const data =  await db.product.update({
                         where:{
                             name: upd_cate.name
                         },
@@ -164,7 +164,7 @@ const upd_Product = async (req, res) => {
                     })
                     
                     if (data.count != 0) {
-                        res.status(200).send({message: 'success', status_code: 200, success: true})
+                        res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
                     }else{
                         res.status(202).send({message: 'fail', status_code: 202, success: false})
                     } 

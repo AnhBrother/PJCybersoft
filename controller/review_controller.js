@@ -4,20 +4,22 @@ const { decodeToken } = require("../helper/jwt.help");
 const get_review = async (req, res) => {
     try {
         const name = req.params.nameProd
-
-        if (name == null) {
+        const token = req.headers.authorization
+        const decode = decodeToken(token)
+        
+        if (name == undefined) {
             res.status(400).send("Key wrong")
         }else{
-            const data = await db.product.findFirst({
+            const data = await db.review.findFirst({
                 where:{
-                    name: name
+                    user_ID: decode.data.id,
+                    product:{
+                        name
+                    }
                 },
                 select:{
-                    name: true,
-                    price: true,
                     description: true,
-                    offers: true,
-                    policy: true
+                    rate: true
                 }
             })
 
@@ -38,31 +40,30 @@ const add_review = async (req, res) => {
         const token = req.headers.authorization
         const decode = decodeToken(token)
     
-        if (review.description == null || review.rate == null || review.product == null) {
+        if (review.description == undefined || review.rate == undefined || review.product == undefined) {
             res.status(400).send("Key wrong")
         }else {
-            const id_rv = await db.review.findFirst({
+            const find_prod = await db.product.findUnique({
                 where:{
-                    user_ID: decode.data.id,
-                    product:{
-                        name: review.product
-                    }
-                },
-                select:{
-                    id: true
+                    name: review.product
                 }
             })
-    
-            if (id_rv != null) {
-                res.status(201).send("Review was created")
+            
+            if (find_prod == null) {
+                res.status(400).send("Product not exist")
+            
             } else {
-                const find_prod = await db.product.findFirst({
+                const id_rv = await db.review.findFirst({
                     where:{
-                        name: review.product
+                        user_ID: decode.data.id,
+                        product:{
+                            name: review.product
+                        }
                     }
                 })
-                if (find_prod == null) {
-                    res.status(400).send("Product not exist")
+                
+                if (id_rv != null) {
+                    res.status(400).send("Review was created")
                 }else{               
                     const data = await db.review.create({
                         data:{
@@ -92,40 +93,38 @@ const upd_review = async (req, res) => {
         const token = req.headers.authorization
         const decode = decodeToken(token)
     
-        if (review.description == null || review.rate == null || review.product == null) {
+        if (review.description == undefined || review.rate == undefined || review.product == undefined) {
             res.status(400).send("Key wrong")
         }else{
-            const id_rv = await db.review.findFirst({
+            const find_prod = await db.product.findUnique({
                 where:{
-                    user_ID: decode.data.id,
-                    product:{
-                        name: review.product
-                    }
+                    name: review.product
                 },
                 select:{
                     id: true
                 }
             })
-    
-            if (id_rv == null) {
-                res.status(400).send("Review not exist")
-            }else{
-                const update = await db.review.update({
+            
+            if (find_prod == null) {
+                res.status(400).send("Product not exist")
+            } else {
+                const update = await db.review.updateMany({
                     where:{
-                        id: id_rv.id
+                        product_ID: find_prod.id,
+                        user_ID: decode.data.id
                     },
                     data:{
                         description: review.description,
                         rate: review.rate
                     }
                 })
-    
-                if (update) {
+                
+                if (update.count != 0) {
                     res.status(200).send({message: 'success', status_code: 200, success: true})
                 } else {
                     res.status(202).send({message: 'fail', status_code: 202, success: false})
                 }
-            }
+            }            
         }    
     } catch (error) {
         res.status(500).send(error)
@@ -138,27 +137,25 @@ const del_review = async (req, res) => {
         const token = req.headers.authorization
         const decode = decodeToken(token)
     
-        if (review.product == null) {
+        if (review.product == undefined) {
             res.status(400).send("Key wrong")
         }else{        
-            const id_rv = await db.review.findFirst({
+            const find_prod = await db.product.findUnique({
                 where:{
-                    user_ID: decode.data.id,
-                    product:{
-                        name: review.product
-                    }
+                    name: review.product
                 },
                 select:{
                     id: true
                 }
             })
             
-            if (id_rv = null) {
-                res.status(400).send("Review not exist")
-            }else{
-                const del = await db.review.delete({
+            if (find_prod == null) {
+                res.status(400).send("Product not exist")
+            } else {
+                const del = await db.review.deleteMany({
                     where:{
-                        id: id_rv.id
+                        product_ID: find_prod.id,
+                        user_ID: decode.data.id
                     }
                 })
 

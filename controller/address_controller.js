@@ -37,8 +37,7 @@ const get_Addr = async (req, res) => {
                 }
             })        
             const data = [...[], find_addr.name, find_dict.name, find_commu.name]
-            if (find_addr != null && find_dict != null && find_commu != null) {
-                
+            if (find_addr != null && find_dict != null && find_commu != null) {                
                 res.status(200).send({message: 'success', status_code: 200, success: true, data: data})
             } else {
                 res.status(202).send({message: 'fail', status_code: 202, success: false, data: 'No data'})

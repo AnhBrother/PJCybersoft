@@ -105,18 +105,19 @@ const del_brand = async (req, res) => {
         const namebrand = req.body.name
         if (namebrand == undefined) {
             res.status(400).send("Key wrong")
-        }
-        const data = await db.brand.deleteMany({
-            where: {
-              name: namebrand,
+        }else {
+            const data = await db.brand.delete({
+                where: {
+                  name: namebrand
+                }
+            })
+            
+            if (data.count != 0) {
+                res.status(200).send({message: 'success', status_code: 200, success: true})
+            }else{
+                res.status(202).send({message: 'fail', status_code: 202, success: false})
             }
-        })
-        
-        if (data.count != 0) {
-            res.status(200).send({message: 'success', status_code: 200, success: true})
-        }else{
-            res.status(202).send({message: 'fail', status_code: 202, success: false})
-        }
+        }        
     } catch (error) {
         res.status(500).send(error)
     }

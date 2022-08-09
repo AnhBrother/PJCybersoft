@@ -43,7 +43,7 @@ const addPayment = async (req, res) => {
             if (payment_method_exist == null) {
                 res.status(400).send({message: 'Payment method not exist'})
             } else {
-                const payment_exist = await db.payment.findMany({
+                const payment_exist = await db.payment.findFirst({
                     where:{
                         payment_method_ID: payment_method_exist.id,
                         user_ID: decode.data.id
@@ -51,9 +51,9 @@ const addPayment = async (req, res) => {
                 })
                 
                 if (payment_exist == [] || payment_exist) {
-                    res.status(201).send({message: 'Payment existed'})
+                    res.status(400).send({message: 'Payment existed'})
                 } else {
-                    console.log(payment_exist)
+                    
                     const data = await db.payment.create({
                         data:{
                             name,
@@ -86,18 +86,18 @@ const updPayment = async (req, res) => {
             res.status(400).send("Key wrong")
         }else{
             const data = await db.payment.updateMany({
-                where:{
-                    user_ID: decode.data.id,
+                where:{                    
                     payment_method:{
                         name: payment_method
-                    }
+                    },
+                    user_ID: decode.data.id
                 },
                 data:{
                     name,
                     number
                 }
             })
-
+            
             if (data == null) {
                 res.status(202).send({message: 'fail', status_code: 202, success: false})
             } else {
